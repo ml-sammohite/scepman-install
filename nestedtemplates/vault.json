@@ -166,13 +166,22 @@
             "name": "keyVault",
             "properties": {
               "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+              "groupIds": [
+                "vault"
+              ],
+              "privateLinkServiceConnectionState": {
+                "status": "Approved",
+                "description": "Private endpoint connection approved",
+                "actionsRequired": "None"
+              }
             }
           }
-        ]
+        ],
+        "customNetworkInterfaceName": "[parameters('networkInterfaceName')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-        "[resourceId('Microsoft.Network/privateDnsZones/', parameters('privateDnsZoneName'))]"
+        "[parameters('keyVaultName')]",
+        "[parameters('networkInterfaceName')]"
       ]
     },
     {
