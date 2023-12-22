@@ -19,13 +19,31 @@
     "location": {
       "type": "string",
       "metadata": {
-        "description": "Resource Group"
+        "description": "Region in which to create the key vault."
       }
     },
     "resourceTags": {
       "type": "object",
       "metadata": {
         "description": "Tags to be assigned to the created resources"
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Virtual Network to associate with the key vault."
+      }
+    },
+    "privateEndpointName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the private endpoint for the key vault."
+      }
+    },
+    "privateDnsZoneName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the private DNS zone for the key vault."
       }
     }
   },
@@ -67,6 +85,12 @@
           "name": "premium",
           "family": "A"
         },
+        "networkAcls": {
+            "bypass": "None",
+            "defaultAction": "Deny",
+            "ipRules": [],
+            "virtualNetworkRules": []
+        },
         "accessPolicies": [
           {
             "objectId": "[parameters('permittedPrincipalId')]",
@@ -79,12 +103,75 @@
           }
         ]
       }
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones",
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('privateDnsZoneName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('resourceTags')]",
+      "properties": {}
+    },
+    {
+      "apiVersion": "2022-07-01",
+      "type": "Microsoft.Network/privateEndpoints",
+      "name": "[parameters('privateEndpointName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('resourceTags')]",
+      "properties": {
+        "subnet": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'default')]"
+        },
+        "privateLinkServiceConnections": [
+          {
+            "name": "keyVault",
+            "properties": {
+              "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+              "groupIds": []
+            }
+          }
+        ],
+        "dnsSettings": {
+          "privateDnsZoneConfigs": [
+            {
+              "name": "[parameters('privateDnsZoneName')]",
+              "properties": {
+                "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZoneName'))]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+        "[resourceId('Microsoft.Network/privateDnsZones/', parameters('privateDnsZoneName'))]"
+      ]
+    },
+    {
+      "apiVersion": "2022-07-01",
+      "type": "Microsoft.KeyVault/vaults/privateEndpointConnections",
+      "name": "[concat(parameters('keyVaultName'), '/pec-keyvault-connection')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "privateEndpoint": {
+          "id": "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpointName'))]"
+        },
+        "privateLinkServiceConnectionState": {
+          "status": "Approved",
+          "description": "Private endpoint connection approved",
+          "actionsRequired": "None"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+        "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpointName'))]"
+      ]
     }
   ],
   "outputs": {
-  "keyVaultURL": {
-    "type": "string",
-    "value": "[reference(parameters('keyVaultName')).vaultUri]"
-  }
+    "keyVaultURL": {
+      "type": "string",
+      "value": "[reference(parameters('keyVaultName')).vaultUri]"
+    }
   }
 }
