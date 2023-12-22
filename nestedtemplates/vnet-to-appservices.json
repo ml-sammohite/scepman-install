@@ -28,8 +28,7 @@
       "name": "[concat(parameters('appServiceName'), '/VNetConnection')]",
       "location": "[parameters('location')]",
       "properties": {
-        "vnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-        "subnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices')]",
+        "vnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices')]",
         "isSwift": false
       }
     }
