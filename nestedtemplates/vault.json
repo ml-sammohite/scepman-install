@@ -34,16 +34,22 @@
         "description": "Name of the Virtual Network to associate with the key vault."
       }
     },
+    "networkInterfaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the network interface to be created for the key vault."
+      }
+    },
     "privateEndpointName": {
       "type": "string",
       "metadata": {
-        "description": "Name of the private endpoint for the key vault."
+        "description": "Name of the private endpoint to be created for the key vault."
       }
     },
     "privateDnsZoneName": {
       "type": "string",
       "metadata": {
-        "description": "Name of the private DNS zone for the key vault."
+        "description": "Name of the private DNS zone to be created for the key vault."
       }
     }
   },
@@ -111,6 +117,41 @@
       "properties": {}
     },
     {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2023-06-01",
+      "name": "[parameters('networkInterfaceName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('resourceTags')]",
+      "kind": "Regular",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "privateEndpointIpConfig.scepmankv",
+            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'default')]"
+              },
+              "privateLinkConnectionProperties": {
+                "groupId": "vault",
+                "requiredMemberName": "default",
+                "fqdns": [
+                  "[reference(parameters('keyVaultName')).vaultUri]"
+                ]
+              }
+            }
+          }
+        ],
+        "enableAcceleratedNetworking": false,
+        "enableIPForwarding": false,
+        "disableTcpStateTracking": false,
+        "nicType": "Standard",
+        "auxiliaryMode": "None",
+        "auxiliarySku": "None"
+      }
+    },
+    {
       "apiVersion": "2022-07-01",
       "type": "Microsoft.Network/privateEndpoints",
       "name": "[parameters('privateEndpointName')]",
@@ -127,21 +168,44 @@
               "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
             }
           }
-        ],
-        "dnsSettings": {
-          "privateDnsZoneConfigs": [
-            {
-              "name": "[parameters('privateDnsZoneName')]",
-              "properties": {
-                "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZoneName'))]"
-              }
-            }
-          ]
-        }
+        ]
       },
       "dependsOn": [
         "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
         "[resourceId('Microsoft.Network/privateDnsZones/', parameters('privateDnsZoneName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+      "apiVersion": "2023-06-01",
+      "name": "[concat(parameters('privateEndpointName'), '/default')]",
+      "dependsOn": [
+          "[parameters('privateEndpointName')]", "[parameters('privateDnsZoneName')]"
+      ],
+      "properties": {
+        "privateDnsZoneConfigs": [
+          {
+            "name": "[parameters('privateDnsZoneName')]",
+            "properties": {
+              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZoneName'))]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "apiVersion": "2020-06-01",
+      "name": "[concat(parameters('privateDnsZoneName'), '/', parameters('keyVaultName'), '-link')]",
+      "location": "global",
+      "properties": {
+        "registrationEnabled": false,
+        "virtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+        }
+      },
+      "dependsOn": [
+        "[parameters('privateDnsZoneName')]"
       ]
     },
     {
@@ -160,8 +224,8 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-        "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpointName'))]"
+        "[parameters('keyVaultName')]",
+        "[parameters('privateEndpointName')]"
       ]
     }
   ],

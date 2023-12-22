@@ -87,6 +87,14 @@
       },
       "defaultValue": "vnet-scepman-UNIQUENAME"
     },
+    "networkInterfaceForKeyVaultName": {
+      "type": "string",
+      "maxLength": 80,
+      "metadata": {
+        "description": "The name of the Virtual Network."
+      },
+      "defaultValue": "nic-kv-scepman-UNIQUENAME"
+    },
     "privateEndpointForKeyVaultName": {
       "type": "string",
       "minLength": 4,
@@ -302,6 +310,9 @@
           "virtualNetworkName": {
             "value": "[parameters('virtualNetworkName')]"
           },
+          "networkInterfaceName": {
+            "value": "[parameters('networkInterfaceForKeyVaultName')]"
+          },          
           "privateEndpointName": {
             "value": "[parameters('privateEndpointForKeyVaultName')]"
           },
