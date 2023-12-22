@@ -58,7 +58,7 @@
               "delegations": [
                 {
                   "name": "delegation",
-                  "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices'), '/delegations/delegation')]",
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets/delegations', parameters('virtualNetworkName'), 'snet-scepman-appservices', 'delegation')]",
                   "properties": {
                     "serviceName": "Microsoft.Web/serverfarms"
                   },

@@ -119,10 +119,10 @@
     }
   },
   "variables": {
-    "artifactsRepositoryUrl": "https://raw.githubusercontent.com/scepman/install/dev-privateendpoint/",
+    "artifactsRepositoryUrl": "https://raw.githubusercontent.com/scepman/install/dev_privateendpoint/",
     "ArtifactsLocationSCEPman": "[uri(variables('artifactsRepositoryUrl'),'dist/Artifacts.zip')]",
     "ArtifactsLocationCertMaster":  "[uri(variables('artifactsRepositoryUrl'),'dist-certmaster/CertMaster-Artifacts.zip')]",
-    "templateRepositoryUrl": "https://raw.githubusercontent.com/scepman/install/dev-privateendpoint/",
+    "templateRepositoryUrl": "https://raw.githubusercontent.com/scepman/install/dev_privateendpoint/",
     "vnetTemplateUri": "[uri(variables('templateRepositoryUrl'), 'nestedtemplates/vnet.json')]",
     "vnet2AppServicesTemplateUri": "[uri(variables('templateRepositoryUrl'), 'nestedtemplates/vnet-to-appservices.json')]",
     "appSvcTemplateUri": "[uri(variables('templateRepositoryUrl'), 'nestedtemplates/appSvcDouble.json')]",
