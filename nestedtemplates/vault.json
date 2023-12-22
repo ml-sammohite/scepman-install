@@ -176,8 +176,7 @@
               }
             }
           }
-        ],
-        "customNetworkInterfaceName": "[parameters('networkInterfaceName')]"
+        ]
       },
       "dependsOn": [
         "[parameters('keyVaultName')]",
