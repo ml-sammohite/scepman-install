@@ -21,7 +21,6 @@
       }
     }
   },
-  "variables": {},
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
@@ -45,7 +44,6 @@
             "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'default')]",
             "properties": {
               "addressPrefix": "10.0.0.0/24",
-              "delegations": [],
               "privateEndpointNetworkPolicies": "Disabled",
               "privateLinkServiceNetworkPolicies": "Enabled",
               "defaultOutboundAccess": true
@@ -57,7 +55,6 @@
             "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices')]",
             "properties": {
               "addressPrefix": "10.0.1.0/24",
-              "serviceEndpoints": [],
               "delegations": [
                 {
                   "name": "delegation",
@@ -74,7 +71,6 @@
             "type": "Microsoft.Network/virtualNetworks/subnets"
           }
         ],
-        "virtualNetworkPeerings": [],
         "enableDdosProtection": false
       }
     }
