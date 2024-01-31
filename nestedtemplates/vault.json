@@ -117,41 +117,6 @@
       "properties": {}
     },
     {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2023-06-01",
-      "name": "[parameters('networkInterfaceName')]",
-      "location": "[parameters('location')]",
-      "tags": "[parameters('resourceTags')]",
-      "kind": "Regular",
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "privateEndpointIpConfig.scepmankv",
-            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'default')]"
-              },
-              "privateLinkConnectionProperties": {
-                "groupId": "vault",
-                "requiredMemberName": "default",
-                "fqdns": [
-                  "[reference(parameters('keyVaultName')).vaultUri]"
-                ]
-              }
-            }
-          }
-        ],
-        "enableAcceleratedNetworking": false,
-        "enableIPForwarding": false,
-        "disableTcpStateTracking": false,
-        "nicType": "Standard",
-        "auxiliaryMode": "None",
-        "auxiliarySku": "None"
-      }
-    },
-    {
       "apiVersion": "2022-07-01",
       "type": "Microsoft.Network/privateEndpoints",
       "name": "[parameters('privateEndpointName')]",
@@ -195,7 +160,7 @@
           {
             "name": "[parameters('privateDnsZoneName')]",
             "properties": {
-              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZoneName'))]"
+              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZoneName'))]" // ToDo: has invalid private dns zone ids . (Code: InvalidPrivateDnsZoneIds)
             }
           }
         ]
@@ -214,26 +179,6 @@
       },
       "dependsOn": [
         "[parameters('privateDnsZoneName')]"
-      ]
-    },
-    {
-      "apiVersion": "2022-07-01",
-      "type": "Microsoft.KeyVault/vaults/privateEndpointConnections",
-      "name": "[concat(parameters('keyVaultName'), '/pec-keyvault-connection')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "privateEndpoint": {
-          "id": "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpointName'))]"
-        },
-        "privateLinkServiceConnectionState": {
-          "status": "Approved",
-          "description": "Private endpoint connection approved",
-          "actionsRequired": "None"
-        }
-      },
-      "dependsOn": [
-        "[parameters('keyVaultName')]",
-        "[parameters('privateEndpointName')]"
       ]
     }
   ],
