@@ -144,8 +144,7 @@
         ]
       },
       "dependsOn": [
-        "[parameters('keyVaultName')]",
-        "[parameters('networkInterfaceName')]"
+        "[parameters('keyVaultName')]"
       ]
     },
     {
