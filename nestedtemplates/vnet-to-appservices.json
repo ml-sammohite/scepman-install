@@ -36,6 +36,7 @@
         "type": "Microsoft.Web/sites",
         "apiVersion": "2023-01-01",
         "name": "[parameters('appServiceName')]",
+        "location": "[parameters('location')]",
         "properties": {
           "vnetRouteAllEnabled": true,
           "vnetImagePullEnabled": false,
