@@ -40,7 +40,7 @@
           "vnetRouteAllEnabled": true,
           "vnetImagePullEnabled": false,
           "vnetContentShareEnabled": false,
-          "virtualNetworkSubnetId": "[concat(parameters('virtualNetworkName'), '/subnets/snet-scepman-appservices')]"
+          "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices')]"
         }
     }
   ]
