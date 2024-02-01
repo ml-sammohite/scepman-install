@@ -34,22 +34,10 @@
         "description": "Name of the Virtual Network to associate with the key vault."
       }
     },
-    "networkInterfaceName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the network interface to be created for the key vault."
-      }
-    },
     "privateEndpointName": {
       "type": "string",
       "metadata": {
         "description": "Name of the private endpoint to be created for the key vault."
-      }
-    },
-    "privateDnsZoneName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the private DNS zone to be created for the key vault."
       }
     }
   },
@@ -93,7 +81,7 @@
         },
         "networkAcls": {
             "bypass": "None",
-            "defaultAction": "Deny",
+            "defaultAction": "Deny"
         },
         "accessPolicies": [
           {
@@ -111,7 +99,8 @@
     {
       "type": "Microsoft.Network/privateDnsZones",
       "apiVersion": "2020-06-01",
-      "name": "[parameters('privateDnsZoneName')]",
+      "name": "privatelink.vaultcore.azure.net",  // The A record is only created if you use this magic name
+                                                  // See: https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-dns#security
       "location": "Global",
       "tags": "[parameters('resourceTags')]",
       "properties": {}
@@ -152,14 +141,14 @@
       "apiVersion": "2023-06-01",
       "name": "[concat(parameters('privateEndpointName'), '/default')]",
       "dependsOn": [
-          "[parameters('privateEndpointName')]", "[parameters('privateDnsZoneName')]"
+          "[parameters('privateEndpointName')]", "privatelink.vaultcore.azure.net"
       ],
       "properties": {
         "privateDnsZoneConfigs": [
           {
-            "name": "[parameters('privateDnsZoneName')]",
+            "name": "privatelink.vaultcore.azure.net",
             "properties": {
-              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZoneName'))]" // ToDo: has invalid private dns zone ids . (Code: InvalidPrivateDnsZoneIds)
+              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.vaultcore.azure.net')]"
             }
           }
         ]
@@ -168,7 +157,7 @@
     {
       "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
       "apiVersion": "2020-06-01",
-      "name": "[concat(parameters('privateDnsZoneName'), '/', parameters('keyVaultName'), '-link')]",
+      "name": "[concat('privatelink.vaultcore.azure.net/', parameters('keyVaultName'), '-link')]",
       "location": "global",
       "properties": {
         "registrationEnabled": false,
@@ -177,7 +166,7 @@
         }
       },
       "dependsOn": [
-        "[parameters('privateDnsZoneName')]"
+        "privatelink.vaultcore.azure.net"
       ]
     }
   ],

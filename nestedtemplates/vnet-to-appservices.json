@@ -31,6 +31,17 @@
         "vnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices')]",
         "isSwift": false
       }
+    },
+    {
+        "type": "Microsoft.Web/sites",
+        "apiVersion": "2023-01-01",
+        "name": "[parameters('appServiceName')]",
+        "properties": {
+          "vnetRouteAllEnabled": true,
+          "vnetImagePullEnabled": false,
+          "vnetContentShareEnabled": false,
+          "virtualNetworkSubnetId": "[concat(parameters('virtualNetworkName'), '/subnets/snet-scepman-appservices')]"
+        }
     }
   ]
 }
