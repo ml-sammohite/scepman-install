@@ -30,7 +30,10 @@
       "properties": {
         "vnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices')]",
         "isSwift": false
-      }
+      },
+      "dependsOn": [
+        "[parameters('appServiceName')]"
+      ]
     },
     {
         "type": "Microsoft.Web/sites",
@@ -42,10 +45,7 @@
           "vnetImagePullEnabled": false,
           "vnetContentShareEnabled": false,
           "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices')]"
-        },
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites/virtualNetworkConnections', parameters('appServiceName'), 'VNetConnection')]"
-        ]
+        }
     }
   ]
 }
