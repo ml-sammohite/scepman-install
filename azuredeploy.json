@@ -178,7 +178,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
-      "name": "[concat('AppServiceConnectionToVirtualNetwork', copyIndex())]",
+      "name": "[concat('AppService-', copyIndex(), '-ConnectionToVirtualNetwork')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -198,8 +198,8 @@
         }
       },
       "dependsOn": [
-        "VirtualNetwork", "SCEPmanAppServices",
-        "SCEPmanVault", "SCEPmanStorageAccount" // The connection does not actually depend on these two resources,
+        "VirtualNetwork", "SCEPmanAppServices"//,
+       // "SCEPmanVault", "SCEPmanStorageAccount" // The connection does not actually depend on these two resources,
                                                 // but concurrent modifications to the same VNET can lead to deployment errors.
                                                 // This makes sure, only one operation at a time is performed on the VNET.
       ],
@@ -297,6 +297,7 @@
         },
         "dependsOn": [
           "VirtualNetwork",
+          "AppService-0-ConnectionToVirtualNetwork", "AppService-1-ConnectionToVirtualNetwork",
           "SCEPmanStorageAccount" // The connection does not actually depend on this resource,
                                   // but concurrent modifications to the same VNET can lead to deployment errors.
                                   // This makes sure, only one operation at a time is performed on the VNET.
@@ -419,7 +420,8 @@
           }
         },
         "dependsOn": [
-          "VirtualNetwork"
+          "VirtualNetwork",
+          "AppService-0-ConnectionToVirtualNetwork", "AppService-1-ConnectionToVirtualNetwork"
         ]
       }
     }
