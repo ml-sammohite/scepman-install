@@ -23,19 +23,6 @@
   },
   "resources": [
     {
-      "type": "Microsoft.Web/sites/virtualNetworkConnections",
-      "apiVersion": "2023-01-01",
-      "name": "[concat(parameters('appServiceName'), '/VNetConnection')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "vnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices')]",
-        "isSwift": false
-      },
-      "dependsOn": [
-        "[parameters('appServiceName')]"
-      ]
-    },
-    {
         "type": "Microsoft.Web/sites",
         "apiVersion": "2023-01-01",
         "name": "[parameters('appServiceName')]",
