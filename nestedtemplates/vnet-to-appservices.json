@@ -44,7 +44,7 @@
           "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices')]"
         },
         "dependsOn": [
-          "[concat(parameters('appServiceName'), '/VNetConnection')]"
+          "[resourceId('Microsoft.Web/sites/virtualNetworkConnections', parameters('appServiceName'), 'VNetConnection')]"
         ]
     }
   ]
