@@ -132,7 +132,11 @@
     "vaultTemplateUri": "[uri(variables('templateRepositoryUrl'), 'nestedtemplates/vault.json')]",
     "appConfigTemplateUri": "[uri(variables('templateRepositoryUrl'), 'nestedtemplates/appConfig-scepman.json')]",
     "appConfigCertMasterTemplateUri": "[uri(variables('templateRepositoryUrl'), 'nestedtemplates/appConfig-certmaster.json')]",
-    "stgAccountTemplateUri": "[uri(variables('templateRepositoryUrl'), 'nestedtemplates/stgAccount.json')]"
+    "stgAccountTemplateUri": "[uri(variables('templateRepositoryUrl'), 'nestedtemplates/stgAccount.json')]",
+    "appServiceNames": [
+        "[parameters('primaryAppServiceName')]",
+        "[parameters('certificateMasterAppServiceName')]"
+      ]
   },
   "resources": [
     {
@@ -174,7 +178,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
-      "name": "SCEPmanConnectionToVirtualNetwork",
+      "name": "[concat('AppServiceConnectionToVirtualNetwork', copyIndex())]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -189,40 +193,22 @@
             "value": "[parameters('location')]"
           },
           "appServiceName": {
-            "value": "[parameters('primaryAppServiceName')]"
-          }
-        }
-      },
-      "dependsOn": [
-        "VirtualNetwork", "SCEPmanAppServices"
-      ]
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2021-04-01",
-      "name": "SCEPmanCertMasterConnectionToVirtualNetwork",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('vnet2AppServicesTemplateUri')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "virtualNetworkName": {
-            "value": "[parameters('virtualNetworkName')]"
-          },
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "appServiceName": {
-            "value": "[parameters('certificateMasterAppServiceName')]"
+            "value": "[variables('appServiceNames')[copyIndex()]]"
           }
         }
       },
       "dependsOn": [
         "VirtualNetwork", "SCEPmanAppServices",
-        "SCEPmanConnectionToVirtualNetwork" // A network can do only one thing concurrently, the second often fails
-      ]
+        "SCEPmanVault", "SCEPmanStorageAccount" // The connection does not actually depend on these two resources,
+                                                // but concurrent modifications to the same VNET can lead to deployment errors.
+                                                // This makes sure, only one operation at a time is performed on the VNET.
+      ],
+      "copy": {
+        "name": "appServiceConnectionToVirtualNetwork",
+        "count": 2,
+        "mode": "serial",
+        "batchSize": 1
+      }
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -310,7 +296,10 @@
           }
         },
         "dependsOn": [
-          "VirtualNetwork"
+          "VirtualNetwork",
+          "SCEPmanStorageAccount" // The connection does not actually depend on this resource,
+                                  // but concurrent modifications to the same VNET can lead to deployment errors.
+                                  // This makes sure, only one operation at a time is performed on the VNET.
         ]
       }
     },
