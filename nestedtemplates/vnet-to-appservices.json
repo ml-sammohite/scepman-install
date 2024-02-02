@@ -41,7 +41,7 @@
         "name": "[parameters('appServiceName')]",
         "location": "[parameters('location')]",
         "properties": {
-          "vnetRouteAllEnabled": true,
+          "vnetRouteAllEnabled": false,
           "vnetImagePullEnabled": false,
           "vnetContentShareEnabled": false,
           "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'snet-scepman-appservices')]"
