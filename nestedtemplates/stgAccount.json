@@ -59,7 +59,11 @@
         "isHnsEnabled": false,
         "isNfsV3Enabled": false,
         "minimumTlsVersion": "TLS1_2",
-        "supportsHttpsTrafficOnly": true
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+            "bypass": "None",
+            "defaultAction": "Deny"
+        }
       }
     },
     {
