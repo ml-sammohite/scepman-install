@@ -301,7 +301,7 @@
             "value": "[parameters('virtualNetworkName')]"
           },
           "privateEndpointName": {
-            "value": "[parameters('privateEndpointForKeyVaultName')]"
+            "value": "[if(parameters('deployPrivateNetwork'), parameters('privateEndpointForKeyVaultName'), 'None')]"
           }
         }
       },
@@ -423,7 +423,7 @@
             "value": "[parameters('virtualNetworkName')]"
           },
           "privateEndpointName": {
-            "value": "[parameters('privateEndpointForTableStorage')]"
+            "value": "[if(parameters('deployPrivateNetwork'), parameters('privateEndpointForTableStorage'), 'None')]"
           }
         }
       },
