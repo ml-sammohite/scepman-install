@@ -308,7 +308,7 @@
       "dependsOn": [
         "VirtualNetwork",
         "AppService-0-ConnectionToVirtualNetwork", "AppService-1-ConnectionToVirtualNetwork",
-        "[if(parameters('deployPrivateNetwork'), 'SCEPmanStorageAccount', json('null'))]" // This is required so there is no simultaneous modification of the VNET
+        "[if(parameters('deployPrivateNetwork'), 'SCEPmanStorageAccount', '')]" // This is required so there is no simultaneous modification of the VNET
       ]
     },
     {
