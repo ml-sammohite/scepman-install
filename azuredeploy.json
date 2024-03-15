@@ -308,7 +308,9 @@
       "dependsOn": [
         "VirtualNetwork",
         "AppService-0-ConnectionToVirtualNetwork", "AppService-1-ConnectionToVirtualNetwork",
-        "[if(parameters('deployPrivateNetwork'), 'SCEPmanStorageAccount', 'SCEPmanAppServices')]" // The dependency to SCEPmanAppServices is implicitly there already, but you cannot just pass an empty string or null
+          // This is only to ensure that no concurrent modifications are made to the VNET. If no VNET is added, 
+          // the dependency is not required, but an if() statement in dependsOn is against Best Practice, so we'll accept the performance hit instead.
+        "SCEPmanStorageAccount" 
       ]
     },
     {
